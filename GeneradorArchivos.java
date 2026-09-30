@@ -26,7 +26,6 @@ public class GeneradorArchivos {
         listaNotas.add(new Nota("A3", "Programacion", 3.0, 4));
     }
 
-    // OPCIÓN [1]: Generar archivos de prueba
     public void generar() {
         System.out.println("Generando archivos de prueba...");
         try (PrintWriter writerAlumnos = new PrintWriter(ARCHIVO_ALUMNOS);
@@ -46,7 +45,6 @@ public class GeneradorArchivos {
         }
     }
 
-    // OPCIÓN [2]: Leer archivo de alumnos
     public List<Alumno> leerAlumnos() {
         List<Alumno> alumnos = new ArrayList<>();
         File file = new File(ARCHIVO_ALUMNOS);
@@ -71,7 +69,6 @@ public class GeneradorArchivos {
         return alumnos;
     }
 
-    // OPCIÓN [2]: Leer archivo de notas
     public List<Nota> leerNotas() {
         List<Nota> notas = new ArrayList<>();
         File file = new File(ARCHIVO_NOTAS);
@@ -89,9 +86,14 @@ public class GeneradorArchivos {
                         String id = partes[0];
                         String materia = partes[1];
                         double notaVal = Double.parseDouble(partes[2]);
-                        
-                        // Parsea "3_creditos" eliminando "_creditos"
                         int creditosVal = Integer.parseInt(partes[3].split("_")[0]);
+
+                        // VALIDACIÓN REGLA DE NEGOCIO (ENTREGA 2)
+                        if (notaVal < 0.0 || notaVal > 5.0 || creditosVal <= 0) {
+                            System.out.println("⚠️ ALERTA: Nota ignorada por inconsistencia de datos -> Estudiante: " 
+                                    + id + " (" + materia + ": " + notaVal + ", " + creditosVal + " créditos)");
+                            continue;
+                        }
 
                         notas.add(new Nota(id, materia, notaVal, creditosVal));
                     }
@@ -103,13 +105,12 @@ public class GeneradorArchivos {
         return notas;
     }
 
-    // OPCIÓN [4]: Descargar/Escribir archivo promedios.csv
     public void guardarPromedios(List<Promedio> promedios) {
         try (PrintWriter writer = new PrintWriter(ARCHIVO_PROMEDIOS)) {
             for (Promedio p : promedios) {
                 writer.println(p.toString());
             }
-            System.out.println("Archivo " + ARCHIVO_PROMEDIOS + " generado exitosamente con el Cuadro de Honor.\n");
+            System.out.println("Archivo " + ARCHIVO_PROMEDIOS + " generado exitosamente con el estado de becas.\n");
         } catch (Exception e) {
             System.out.println("Error al guardar " + ARCHIVO_PROMEDIOS + ": " + e.getMessage());
         }

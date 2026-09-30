@@ -1,13 +1,3 @@
-/*
- * Proyecto: Notas Universitarias
- * Asignatura: CONCEPTOS FUNDAMENTALES DE PROGRAMACIÓN-[GRUPO B03]
- * Su Grupo: G14
- * Integrantes:
- * - NORVEY PEÑA ROMERO
- * - ANDRES PORTILLO ARIAS
- * - DANIEL QUITIAN ALZATE
- */
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -39,10 +29,10 @@ public class Main {
     }
 
     public static void menu() {
-        System.out.println("====== SISTEMA DE NOTAS UNIVERSITARIAS ======");
+        System.out.println("====== SISTEMA DE NOTAS UNIVERSITARIAS (v2.0) ======");
         System.out.println("[1] Generar Archivos Base (alumnos.csv y notas.txt)");
         System.out.println("[2] Importar/Ver Base de Datos");
-        System.out.println("[3] Calcular e Importar/Ver Salida (Cuadro de Honor)");
+        System.out.println("[3] Calcular e Importar/Ver Salida (Cuadro de Honor y Becas)");
         System.out.println("[4] Descargar Salida (promedios.csv)");
         System.out.println("[5] Salir");
         System.out.print("Seleccione una opción: ");
@@ -85,15 +75,16 @@ public class Main {
 
                 promedios = calcularPromediosPonderados(alumnos, notas);
                 
-                // Ordenar de mayor a menor promedio (Ranking / Cuadro de Honor)
+                // Ordenar de mayor a menor promedio
                 promedios.sort((p1, p2) -> Double.compare(p2.getPromedio(), p1.getPromedio()));
 
-                System.out.println("\n--- CUADRO DE HONOR / RANKING DE PROMEDIOS ---");
+                System.out.println("\n--- CUADRO DE HONOR Y CLASIFICACIÓN DE BECAS ---");
                 int puesto = 1;
                 for (Promedio p : promedios) {
                     System.out.println("#" + puesto + " | ID: " + p.getIdEstudiante() 
                             + " | Nombre: " + p.getNombreEstudiante() 
-                            + " | Promedio Ponderado: " + String.format("%.2f", p.getPromedio()));
+                            + " | Promedio: " + String.format("%.2f", p.getPromedio())
+                            + " | Estado Beca: [" + p.getEstadoBeca() + "]");
                     puesto++;
                 }
                 System.out.println();
@@ -124,7 +115,6 @@ public class Main {
         }
     }
 
-    // Método auxiliar para el cálculo del promedio ponderado
     private static List<Promedio> calcularPromediosPonderados(List<Alumno> listaAlumnos, List<Nota> listaNotas) {
         List<Promedio> resultados = new ArrayList<>();
 
@@ -140,11 +130,12 @@ public class Main {
             }
 
             double promedioFinal = (totalCreditos > 0) ? (sumaPonderada / totalCreditos) : 0.0;
-            
-            // Redondear a 2 decimales
             promedioFinal = Math.round(promedioFinal * 100.0) / 100.0;
 
-            resultados.add(new Promedio(alumno.getId(), alumno.getNombre(), promedioFinal));
+            // REGLA DE BECAS (ENTREGA 2): Promedios >= 4.0 aplican a beca
+            String estadoBeca = (promedioFinal >= 4.0) ? "APLICA_BECA" : "NO_APLICA";
+
+            resultados.add(new Promedio(alumno.getId(), alumno.getNombre(), promedioFinal, estadoBeca));
         }
 
         return resultados;
